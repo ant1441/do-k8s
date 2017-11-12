@@ -18,8 +18,7 @@ spec:
             mountPath: /data/db
       volumes:
           - name: mongo-storage
-            hostPath:
-              path: /data/db
+            emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
