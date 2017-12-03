@@ -53,9 +53,17 @@ fi
 # Generate token and insert into the script files
 if grep --silent --line-regexp "TOKEN=xxxxxx.yyyyyyyyyyyyyyyy" master.sh; then
     echo "Generating a new TOKEN"
-    TOKEN=`python -c 'import random; print "%0x.%0x" % (random.SystemRandom().getrandbits(3*8), random.SystemRandom().getrandbits(8*8))'`
+    while ! [[ $TOKEN =~ ^([a-z0-9]{6})\.([a-z0-9]{16})$ ]]; do
+        TOKEN=`python -c 'import random; print "%0x.%0x" % (random.SystemRandom().getrandbits(3*8), random.SystemRandom().getrandbits(8*8))'`
+    done
     sed -i "s/^TOKEN=.*/TOKEN=${TOKEN}/" master.sh
     sed -i "s/^TOKEN=.*/TOKEN=${TOKEN}/" node.sh
+else
+    TOKEN=$(grep --line-regexp "TOKEN=\([a-z0-9]\{6\}\)\.\([a-z0-9]\{16\}\)" master.sh | cut -d= -f2)
+fi
+if [ -z $TOKEN ]; then
+    echo "No token available"
+    exit 1
 fi
 
 if ! grep --silent --line-regexp "$MASTER_NAME" <(doctl compute droplet list --no-header --format Name); then
@@ -88,7 +96,7 @@ done
 # Run this after a few minutes. Wait till Kubernetes Master is up and running
 while ! scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$LOCAL_SSH_KEY" root@$MASTER_IP_PUBLIC:/etc/kubernetes/admin.conf .; do
     echo "kubectl conf not yet available..."
-    sleep 5
+    sleep 30
 done
 
 if ! grep --silent --line-regexp "MASTER_IP=${MASTER_IP_PRIVATE}" node.sh; then
