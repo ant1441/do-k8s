@@ -43,8 +43,12 @@ SSH_ID=`doctl compute ssh-key list | grep "$SSH_KEY_NAME" | cut -d' ' -f1`
 SSH_KEY=`doctl compute ssh-key get $SSH_ID --format FingerPrint --no-header`
 
 # Create Tags
-doctl compute tag create $MASTER_TAG
-doctl compute tag create $NODE_TAG
+if ! grep --silent $MASTER_TAG <(doctl compute tag list); then
+    doctl compute tag create $MASTER_TAG
+fi
+if ! grep --silent $NODE_TAG <(doctl compute tag list); then
+    doctl compute tag create $NODE_TAG
+fi
 
 # Generate token and insert into the script files
 if grep --silent --line-regexp "TOKEN=xxxxxx.yyyyyyyyyyyyyyyy" master.sh; then
