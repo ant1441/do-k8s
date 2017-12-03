@@ -2,6 +2,9 @@
 # Replace this with the token 
 TOKEN=xxxxxx.yyyyyyyyyyyyyyyy
 
+FLANNEL_VERSION=0.9.1
+DASHBOARD_VERSION=1.8.0
+
 apt-get update && apt-get upgrade -y 
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -22,5 +25,5 @@ cp /etc/kubernetes/admin.conf $HOME/
 chown $(id -u):$(id -g) $HOME/admin.conf
 export KUBECONFIG=$HOME/admin.conf
 
-kubectl create -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.8.0/src/deploy/recommended/kubernetes-dashboard.yaml --namespace=kube-system
+kubectl create -f https://raw.githubusercontent.com/coreos/flannel/v${FLANNEL_VERSION}/Documentation/kube-flannel.yml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v${DASHBOARD_VERSION}/src/deploy/recommended/kubernetes-dashboard.yaml --namespace=kube-system

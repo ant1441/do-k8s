@@ -14,9 +14,11 @@ NODE_TAG=k8s-node
 DROPLET_IMAGE=ubuntu-16-04-x64
 DROPLET_SIZE=2gb
 
+DOCTL_VERSION=1.7.0
+
 # Download DigitalOcean CLI
 if !command -v doctl >/dev/null 2>&1; then
-    curl -L https://github.com/digitalocean/doctl/releases/download/v1.7.0/doctl-1.7.0-linux-amd64.tar.gz | tar xz
+    curl -L https://github.com/digitalocean/doctl/releases/download/v${DOCTL_VERSION}/doctl-${DOCTL_VERSION}-linux-amd64.tar.gz | tar xz
     sudo mv ~/doctl /usr/local/bin
 fi
 
@@ -95,7 +97,7 @@ done
 
 # Run this after a few minutes. Wait till Kubernetes Master is up and running
 while ! scp -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i "$LOCAL_SSH_KEY" root@$MASTER_IP_PUBLIC:/etc/kubernetes/admin.conf .; do
-    echo "kubectl conf not yet available..."
+    echo "kubectl conf not yet available (may take several minutes)..."
     sleep 30
 done
 
